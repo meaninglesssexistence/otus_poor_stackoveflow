@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if view.is_hot %}
+  <h2>
+    <a class="text-decoration-none" href="{% url 'index' %}">
+      New questions
+    </a>
+    |
+    <span>Hot questions</span>
+  </h2>
+{% else %}
+  <h2>
+    New questions</span>
+    |
+    <a class="text-decoration-none" href="{% url 'index' %}?sort=hot">
+      Hot questions
+    </a>
+  </h2>
+{% endif %}
+
+{% include "hasker/question-list.html" %}
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% if user.is_authenticated %}
+  <div>
+    <a href="{% url 'settings'%}">{{ user.get_username }}</a>
+  </div>
+  <div>
+    <a href="{% url 'logout'%}?next={{request.path}}">Logout</a>
+  </div>
+{% else %}
+  <a href="{% url 'login'%}?next={{request.path}}">Log In</a>
+
+  {% url 'signup' as signup_url %}
+  {% if request.path != signup_url %}
+    <br/>
+    <a href="{% url 'signup'%}">Sign Up</a>
+  {% endif %}
+{% endif %}

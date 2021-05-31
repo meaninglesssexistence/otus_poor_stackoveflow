@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Ask a question</h2>
+
+<form action="{% url 'ask' %}" method="post">
+  {% csrf_token %}
+
+  {{ form.non_field_errors }}
+
+  {% for field in form %}
+    <div class="form-group row mt-3">
+      {{ field.errors }}
+      <label for="{{ field.id_for_label }}"
+             class="col-sm-1 col-form-label">
+        {{ field.label }}
+      </label>
+      <div class="col-sm-10">
+        {{ field }}
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="form-group row mt-3">
+    <div class="col-sm-1">
+    </div>
+    <div class="col-sm">
+      <button type="submit" class="btn btn-primary">Ask!</button>
+    </div>
+  </div>
+</form>
+
+{% load static %}
+<script src="{% static 'autocomplete.js' %}"></script>
+
+<script>
+  var all_tags = [
+  {% for tag in view.all_tags %}
+    "{{ tag.text }}",
+  {% endfor %}
+  ];
+
+  autocomplete(document.getElementById("id_tags"), all_tags,
+    function (ctrl) {
+      var str = ctrl.value;
+      var caret = ctrl.selectionStart;
+      str = str.substring(0, caret);
+      var n = str.lastIndexOf(",");
+      if (n != -1)
+        str = str.substring(n + 1);
+      return str.trim();
+    },
+    function (ctrl, value) {
+      var str = ctrl.value;
+      var caret = ctrl.selectionStart;
+
+      tail = str.substring(caret);
+
+      var head = "";
+      var n = str.substring(0, caret).lastIndexOf(",");
+      if (n != -1)
+        head = str.substring(0, n + 1);
+
+      ctrl.value = head + value + tail;
+    });
+
+</script>
+
+{% endblock %}

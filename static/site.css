@@ -1,0 +1,11 @@
+form img.preview {
+  width: 150px;
+}
+
+img.avatar-large {
+  width: 50px;
+}
+
+img.avatar-small {
+  width: 25px;
+}

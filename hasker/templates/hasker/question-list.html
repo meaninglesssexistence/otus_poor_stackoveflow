@@ -1,0 +1,35 @@
+{% if page_obj %}
+  <ul class="container">
+    {% for question in page_obj %}
+      <li class="row mt-3">
+        <hr/>
+        <div class="col-1 text-center">
+          Votes<br/>
+          {{ question.votes_sum}}
+        </div>
+        <div class="col-1 text-center">
+          Answers<br/>
+          {{ question.answers_count }}
+        </div>
+        <div class="col">
+          <a class="lead text-decoration-none" href="{% url 'question' question.id%}">{{question.title}}</a>
+          <br/>
+          {% for tag in question.tags %}
+            <span class="bg-primary text-white text-center mx-1 px-1">
+              {{ tag.text }}
+            </span>
+          {% endfor %}
+        </div>
+        <div class="col-3 text-center">
+          {{ question.author.username }}<br/>
+          asked {{ question.creation_date|timesince }} ago
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% include "hasker/pagination.html" %}
+
+{% else %}
+  <p>No questions are available.</p>
+{% endif %}

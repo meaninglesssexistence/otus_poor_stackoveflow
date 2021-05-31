@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load template-ext %}
+
+{% block content %}
+
+<div id="question" class="container">
+  <div class="row">
+    <h2>{{ question.title }}</h2>
+  </div>
+  <div class="row">
+    <div class="col-1">
+      <a class="question-vote" href="" data-is-vote-up="1">
+        <i class="bi bi-caret-up-fill"></i>
+      </a>
+      <br/>
+      <span id="votes-num">{{ question.votes_sum }}</span>
+      <br/>
+      <a class="question-vote" href="" data-is-vote-up="0">
+        <i class="bi bi-caret-down-fill"></i>
+      </a>
+    </div>
+    <div class="col">
+      <p>{{ question.text }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-1">
+    </div>
+    <div class="col-8">
+      {% for tag in question.tags %}
+        <span class="bg-primary text-white text-center mx-1 px-1">
+          {{ tag.text }}
+        </span>
+      {% endfor %}
+    </div>
+    <div class="col">
+      {% if question.author.useravatar.avatar %}
+        <img class="avatar-small" src="{{ question.author.useravatar.avatar.url }}"/>
+      {% else %}
+        <img class="avatar-small" src="{% static 'no-avatar.png' %}"/>
+      {% endif %}
+      {{ question.author.username }}
+    </div>
+  </div>
+</div>
+
+
+{% if page_obj %}
+  <h3>Answers</h3>
+  <div id="answers-list">
+    {% for answer in page_obj %}
+      <hr/>
+      <div class="container">
+        <div class="row">
+          <div class="col-1">
+            <a class="answer-vote" href=""
+               data-answer-id="{{ answer.id }}" data-is-vote-up="1">
+              <i class="bi bi-caret-up-fill"></i>
+            </a>
+            <br/>
+            <span class="votes-num">{{ answer.votes_sum }}</span>
+            <br/>
+            <a class="answer-vote" href=""
+               data-answer-id="{{ answer.id }}" data-is-vote-up="0">
+              <i class="bi bi-caret-down-fill"></i>
+            </a>
+          </div>
+          <div class="col">
+            <p>{{ answer.text}}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-1">
+            {% if user.is_authenticated and user.username == question.author.username %}
+              <!--
+                If user is the question's author show a correct
+                and "empty" answer markers.
+              -->
+              <a class="solution-mark" href="#"
+                 data-answer-id="{{ answer.id }}"
+                 data-answer-solution={% if answer.correct %}1{% else %}0{% endif %}>
+                {% if answer.correct %}
+                  <i class="bi bi-star-fill"></i>
+                {% else %}
+                  <i class="bi bi-star"></i>
+                {% endif %}
+              </a>
+            {% else %}
+              <!--
+                If user is not the question's author show a correct answer only.
+              -->
+              {% if answer.correct %}
+                <i class="bi bi-star-fill"></i>
+              {% endif %}
+            {% endif %}
+          </div>
+          <div class="col-8">
+          </div>
+          <div class="col">
+            {% if answer.author.useravatar.avatar %}
+              <img class="avatar-small" src="{{ answer.author.useravatar.avatar.url }}"/>
+            {% else %}
+              <img class="avatar-small" src="{% static 'no-avatar.png' %}"/>
+            {% endif %}
+            {{ answer.author.username }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include "hasker/pagination.html" %}
+{% endif %}
+
+{% if user.is_authenticated %}
+<hr/>
+
+<h3>Your answer:</h3>
+
+<form action="{% url 'question' question_id=question.id %}" method="post">
+  {% csrf_token %}
+
+  {{ form.non_field_errors }}
+
+  <div class="form-group">
+    {{ form.text }}
+  </div>
+
+  <div class="form-group mt-3">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+
+{% endif %}
+
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function setClickHandlers(itemCssClass, getUrl, onResponse) {
+  const isAuthenticated =
+    {% if user.is_authenticated %}true{% else %}false{% endif %}
+  const csrftoken = getCookie('csrftoken');
+
+  for (link of document.getElementsByClassName(itemCssClass)) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      if (!isAuthenticated)
+        return;
+
+      fetch(getUrl(this), {
+            method: "POST",
+            credentials: "same-origin",
+            headers:{
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrftoken,
+            }})
+        .then(response => {
+          if (!response.ok)
+            throw Error(response);
+
+          return response.json();
+        })
+        .then(data => onResponse(this, data))
+        .catch(error => { console.log(error);/* do nothing on error */ });
+    }, true);
+  }
+}
+
+function setSolutionHandler() {
+  const urlSet = "{% url 'solution-set' 0 %}";
+  const urlClear = "{% url 'solution-clear' 0 %}";
+
+  setClickHandlers(
+    "solution-mark",
+    item => {
+      const answerId = item.getAttribute("data-answer-id");
+      const wasSolution = item.getAttribute("data-answer-solution") === "1";
+
+      return (wasSolution ? urlClear : urlSet)
+        .replace(/\/0\//, "/" + answerId + "/");
+    },
+    (item, json) => {
+      const wasSolution = item.getAttribute("data-answer-solution") === "1";
+
+      for (link of document.getElementsByClassName("solution-mark")) {
+        const image = link.firstElementChild;
+
+        if (!wasSolution && link === item) {
+          link.setAttribute("data-answer-solution", "1");
+          image.classList.remove("bi-star");
+          image.classList.add("bi-star-fill");
+        } else {
+          link.setAttribute("data-answer-solution", "0");
+          image.classList.add("bi-star");
+          image.classList.remove("bi-star-fill");
+        }
+      }
+    }
+  );
+}
+
+function setQuestionVotesHandler() {
+  const urlVoteUp = "{% url 'question-vote-up' question.id %}";
+  const urlVoteDown = "{% url 'question-vote-down' question.id %}";
+
+  setClickHandlers(
+    "question-vote",
+    item => {
+      const isVoteUp = item.getAttribute("data-is-vote-up") === "1";
+      return isVoteUp ? urlVoteUp : urlVoteDown;
+    },
+    (item, json) => {
+      document.getElementById("votes-num").textContent = json.votes;
+    }
+  );
+}
+
+function setAnswersVotesHandler() {
+  const urlVoteUp = "{% url 'answer-vote-up' 0 %}";
+  const urlVoteDown = "{% url 'answer-vote-down' 0 %}";
+
+  setClickHandlers(
+    "answer-vote",
+    item => {
+      const answerId = item.getAttribute("data-answer-id");
+      const isVoteUp = item.getAttribute("data-is-vote-up") === "1";
+
+      return (isVoteUp ? urlVoteUp : urlVoteDown)
+        .replace(/\/0\//, "/" + answerId + "/");
+    },
+    (item, json) => {
+      item.parentElement
+        .getElementsByClassName("votes-num")[0]
+        .textContent = json.votes;
+    }
+  );
+}
+
+setSolutionHandler();
+setQuestionVotesHandler();
+setAnswersVotesHandler();
+</script>
+
+{% endblock %}

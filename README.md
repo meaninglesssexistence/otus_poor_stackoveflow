@@ -57,6 +57,13 @@ $ cp stackoverflow/example.env stackoverflow/.env
 $ manage.py migrate
 ```
 
+8. Собрать статические файлы
+
+```
+
+$ manage.py collectstatic --no-input
+```
+
 ### Запуск сервера
 
 ```

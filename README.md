@@ -13,7 +13,7 @@
 
 ## Ссылка на проект
 
-[Hasker: Poor Man's Stackoverflow](https://otus_poor_stackoverflow.herokuapp.com/hasker/)
+[Hasker: Poor Man's Stackoverflow](https://poor-stackoverflow.herokuapp.com/hasker/)
 
 ## Проектные решения
 
@@ -85,7 +85,7 @@ CD настроен на [Heroku](https://www.heroku.com). Выкладываю�
 
 ```
 # Создание приложения
-$ heroku create orm-07
+$ heroku create poor-stackoverflow
 # Подключение/создание Postgres сервера
 $ heroku addons:create heroku-postgresql:hobby-dev
 ```
@@ -94,7 +94,7 @@ $ heroku addons:create heroku-postgresql:hobby-dev
 
 | Название              | Значение                                         |
 | -------------         | ------------------------------------------------ |
-| ALLOWED_HOSTS         | 0.0.0.0,localhost,127.0.0.1,orm-07.herokuapp.com |
+| ALLOWED_HOSTS         | 0.0.0.0,localhost,127.0.0.1,poor-stackoverflow.herokuapp.com |
 | DATABASE_URL          | &lt;Database URL&gt;                             |
 | DEBUG                 | False                                            |
 | DISABLE_COLLECTSTATIC | 1                                                |

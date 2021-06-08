@@ -6,11 +6,14 @@
     <a href="{% url 'logout'%}?next={{request.path}}">Logout</a>
   </div>
 {% else %}
-  <a href="{% url 'login'%}?next={{request.path}}">Log In</a>
+  <p>
+    <a href="{% url 'login'%}?next={{request.path}}">Log In</a>
+  </p>
 
   {% url 'signup' as signup_url %}
   {% if request.path != signup_url %}
-    <br/>
-    <a href="{% url 'signup'%}">Sign Up</a>
+    <p>
+      <a href="{% url 'signup'%}">Sign Up</a>
+    </p>
   {% endif %}
 {% endif %}

@@ -1,9 +1,9 @@
-import django.utils
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 class UserAvatar(models.Model):
@@ -32,7 +32,7 @@ class Tag(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=128)
     text = models.TextField(max_length=2048)
-    creation_date = models.DateTimeField(default=django.utils.timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tag1 = models.ForeignKey(Tag, blank=True, null=True,
@@ -62,7 +62,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     text = models.TextField(max_length=2048)
-    creation_date = models.DateTimeField(default=django.utils.timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now)
     correct = models.BooleanField(default=False)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

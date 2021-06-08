@@ -318,5 +318,6 @@ class SearchListView(ListView, TrendingListViewMixin):
             query = Q(title__contains=f'{self.search_text}')
             query.add(Q(text__contains=f'{self.search_text}'), Q.OR)
 
-        questions = get_question_list_queryset().filter(query)
-        return questions.order_by('-votes_sum', '-creation_date')
+        return get_question_list_queryset().filter(query).order_by(
+            '-votes_sum', '-creation_date'
+        )

@@ -21,13 +21,13 @@
           <a class="text-decoration-none" href="{% url 'index' %}">Hasker</a>
         </div>
         <div class="col my-auto">
-          {% include "search-bar.html" %}
+          {% include "_search-bar.html" %}
         </div>
         <div class="col-1">
-          {% include "user-avatar.html" %}
+          {% include "_user-avatar.html" %}
         </div>
         <div class="col-1 my-auto">
-          {% include "auth.html" %}
+          {% include "_auth.html" %}
         </div>
       </div>
       <hr/>
@@ -37,7 +37,7 @@
           {% endblock %}
         </div>
         <div class="col-3">
-          {% include "hasker/sidebar.html" %}
+          {% include "hasker/_sidebar.html" %}
         </div>
       </div>
     </div>

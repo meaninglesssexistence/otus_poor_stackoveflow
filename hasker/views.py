@@ -307,8 +307,7 @@ class SearchListView(ListView, TrendingListViewMixin):
                 'search_tag',
                 tag=escape(self.search_text[4:].strip())
             )
-        else:
-            return super().get(request)
+        return super().get(request)
 
     def get_queryset(self):
         if self.tag:

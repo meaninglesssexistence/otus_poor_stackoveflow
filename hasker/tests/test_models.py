@@ -29,8 +29,8 @@ class AnswerTest(TestCase):
     def test_removing_on_question_removing(self):
         self.question.delete()
 
-        answers = models.Answer.objects.all()
-        self.assertEqual(0, len(answers))
+        answers = models.Answer.objects.count()
+        self.assertEqual(0, answers)
 
 
 class AnswerVoteTest(TestCase):
@@ -54,14 +54,14 @@ class AnswerVoteTest(TestCase):
     def test_removing_on_answer_removing(self):
         self.answer.delete()
 
-        votes = models.AnswerVote.objects.all()
-        self.assertEqual(0, len(votes))
+        votes = models.AnswerVote.objects.count()
+        self.assertEqual(0, votes)
 
     def test_removing_on_user_removing(self):
         self.user.delete()
 
-        votes = models.AnswerVote.objects.all()
-        self.assertEqual(0, len(votes))
+        votes = models.AnswerVote.objects.count()
+        self.assertEqual(0, votes)
 
     def test_default_value(self):
         self.assertEqual(0, self.vote.vote)
@@ -82,8 +82,8 @@ class QuestionTest(TestCase):
 
         self.user.delete()
 
-        questions = models.Question.objects.all()
-        self.assertEqual(0, len(questions))
+        questions = models.Question.objects.count()
+        self.assertEqual(0, questions)
 
     def test_null_on_tag_removing(self):
         question = models.Question.objects.create(
@@ -135,14 +135,14 @@ class QuestionVoteTest(TestCase):
     def test_removing_on_question_removing(self):
         self.question.delete()
 
-        votes = models.QuestionVote.objects.all()
-        self.assertEqual(0, len(votes))
+        votes = models.QuestionVote.objects.count()
+        self.assertEqual(0, votes)
 
     def test_removing_on_user_removing(self):
         self.user.delete()
 
-        votes = models.QuestionVote.objects.all()
-        self.assertEqual(0, len(votes))
+        votes = models.QuestionVote.objects.count()
+        self.assertEqual(0, votes)
 
     def test_default_value(self):
         self.assertEqual(0, self.vote.vote)

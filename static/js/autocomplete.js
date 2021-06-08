@@ -138,3 +138,33 @@ function autocomplete(inp, arr, getTextFunc, setTextFunc) {
     }
   }
 }
+
+// Предполагается, что контрол `ctrl` содержит список тегов,
+// разделенных запятыми. Функция возвращает тег, находящийся
+// в текущей позиции курсора. 
+function getCurrentTagText(ctrl) {
+  var str = ctrl.value;
+  var caret = ctrl.selectionStart;
+  str = str.substring(0, caret);
+  var n = str.lastIndexOf(",");
+  if (n != -1)
+    str = str.substring(n + 1);
+  return str.trim();
+}
+
+// Предполагается, что контрол `ctrl` содержит список тегов,
+// разделенных запятыми. Функция заменяет тег, находящийся
+// в текущей позиции курсора на значение `value`. 
+function setCurrentTagText(ctrl, value) {
+  var str = ctrl.value;
+  var caret = ctrl.selectionStart;
+
+  tail = str.substring(caret);
+
+  var head = "";
+  var n = str.substring(0, caret).lastIndexOf(",");
+  if (n != -1)
+    head = str.substring(0, n + 1);
+
+  ctrl.value = head + value + tail;
+}

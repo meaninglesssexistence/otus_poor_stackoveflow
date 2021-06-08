@@ -95,7 +95,7 @@ class SettingsFormTest(TestCase):
         })
         self.assertIsNotNone(form.fields['avatar'])
         self.assertHTMLEqual(
-            """<img class="preview" src="/static/no-avatar.png">
+            """<img class="preview" src="/static/img/no-avatar.png">
                <br>
                <input accept="image/*" class="form-control" name="avatar" type="file">
             """,

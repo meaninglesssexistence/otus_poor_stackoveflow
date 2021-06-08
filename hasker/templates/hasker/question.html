@@ -39,7 +39,7 @@
       {% if question.author.useravatar.avatar %}
         <img class="avatar-small" src="{{ question.author.useravatar.avatar.url }}"/>
       {% else %}
-        <img class="avatar-small" src="{% static 'no-avatar.png' %}"/>
+        <img class="avatar-small" src="{% static 'img/no-avatar.png' %}"/>
       {% endif %}
       {{ question.author.username }}
     </div>
@@ -102,7 +102,7 @@
             {% if answer.author.useravatar.avatar %}
               <img class="avatar-small" src="{{ answer.author.useravatar.avatar.url }}"/>
             {% else %}
-              <img class="avatar-small" src="{% static 'no-avatar.png' %}"/>
+              <img class="avatar-small" src="{% static 'img/no-avatar.png' %}"/>
             {% endif %}
             {{ answer.author.username }}
           </div>

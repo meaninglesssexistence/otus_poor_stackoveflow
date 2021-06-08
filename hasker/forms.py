@@ -65,7 +65,7 @@ class ImagePreviewWidget(forms.widgets.ClearableFileInput):
                 '<img class="preview" src="{}"/>', value.url)
         else:
             img_html = format_html(
-                '<img class="preview" src="/static/no-avatar.png"/>', '')
+                '<img class="preview" src="/static/img/no-avatar.png"/>', '')
 
         return f'{img_html}<br/>{input_html}'
 

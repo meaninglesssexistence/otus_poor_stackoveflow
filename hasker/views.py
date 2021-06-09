@@ -9,13 +9,13 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import F, Q, Count, Sum, Value
 from django.db.models.functions import Coalesce
-from django.http import HttpResponseBadRequest, JsonResponse, Http404
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template.loader import render_to_string
 from django.utils.html import escape, strip_tags
 from django.views import View
 from django.views.generic import ListView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, FormView
 
 from .models import Answer, AnswerVote, Question, QuestionVote, Tag
 from .forms import AnswerForm, AskForm, LoginForm, SignUpForm, SettingsForm
@@ -98,23 +98,27 @@ class QuestionDetailView(ListView, TrendingListViewMixin):
         return context
 
 
-class QuestionAnswerView(LoginRequiredMixin, FormView):
+class QuestionAnswerView(LoginRequiredMixin, CreateView):
     form_class = AnswerForm
+    model = Answer
 
     def form_valid(self, form):
-        a = Answer(
-            text=form.cleaned_data['text'],
-            author=self.request.user,
-            question_id=self.kwargs['question_id'])
-        a.save()
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.question_id=self.kwargs['question_id']
+        self.object.save()
 
-        # Send e-mail to the question's author.
-        if a.question.author.email:
-            self.send_email(a, a.question.author.email)
+        # Send e-mail to the question's author if
+        # he/she has an e-mail address.
+        if self.object.question.author.email:
+            self.send_email()
 
         return super().form_valid(form)
 
-    def send_email(self, answer, email):
+        return HttpResponseRedirect(self.get_success_url())
+
+    def send_email(self):
+        answer = self.object
         html_message = render_to_string(
             'hasker/mail-answer.html',
             {
@@ -133,7 +137,7 @@ class QuestionAnswerView(LoginRequiredMixin, FormView):
             message=strip_tags(html_message),
             html_message=html_message,
             from_email=settings.HASKER_SEND_MAIL_FROM,
-            recipient_list=[email]
+            recipient_list=[answer.question.author.email]
         )
 
     def get_success_url(self):

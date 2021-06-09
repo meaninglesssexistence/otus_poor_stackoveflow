@@ -32,17 +32,18 @@ class AskForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = models.Question
         fields = ('title', 'text')
+        widgets = {
+            'tags': forms.Textarea(attrs={'autocomplete': 'off'})
+        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['tags'].widget.attrs.update({'autocomplete': 'off'})
 
-
-class AnswerForm(forms.Form):
-    text = forms.CharField(label='Text', max_length=2048,
-                           widget=forms.Textarea(
-                               attrs={'class': "form-control"}
-                           ))
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = models.Answer
+        fields = ('text',)
+        widgets = {
+            'text': forms.Textarea(attrs={'class': "form-control"})
+        }
 
 
 class LoginForm(BootstrapFormMixin, AuthenticationForm):

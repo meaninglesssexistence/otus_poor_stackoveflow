@@ -73,6 +73,9 @@ class QuestionVote(models.Model):
             MinValueValidator(-1)
         ])
 
+    class Meta:
+        unique_together = ('user', 'question')
+
 
 class AnswerVote(models.Model):
     user = models.ForeignKey(
@@ -89,3 +92,6 @@ class AnswerVote(models.Model):
             MaxValueValidator(1),
             MinValueValidator(-1)
         ])
+
+    class Meta:
+        unique_together = ('user', 'answer')

@@ -17,12 +17,12 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
-from . import models
-from . import forms
+from .models import Answer, AnswerVote, Question, QuestionVote, Tag
+from .forms import AnswerForm, AskForm, LoginForm, SignUpForm, SettingsForm
 
 
 def get_question_list_queryset():
-    return models.Question.objects.select_related(
+    return Question.objects.select_related(
         'author', 'tag1', 'tag2', 'tag3'
     ).annotate(
         answers_count=Count('answer', distinct=True)
@@ -37,7 +37,7 @@ def get_question_list_queryset():
 
 
 class TrendingListViewMixin:
-    trending_list = models.Question.objects.annotate(
+    trending_list = Question.objects.annotate(
         votes_sum=Coalesce(Sum('questionvote__vote'), Value(0))
     ).order_by(
         '-votes_sum', '-creation_date'
@@ -64,7 +64,7 @@ class QuestionDetailView(ListView, TrendingListViewMixin):
     template_name = 'hasker/question.html'
 
     def get_queryset(self):
-        return models.Answer.objects.filter(
+        return Answer.objects.filter(
             question__id=self.kwargs['question_id']
         ).select_related(
             'author', 'author__useravatar'
@@ -76,9 +76,9 @@ class QuestionDetailView(ListView, TrendingListViewMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = forms.AnswerForm()
+        context['form'] = AnswerForm()
 
-        questions = models.Question.objects.filter(
+        questions = Question.objects.filter(
             id=self.kwargs['question_id']
         ).select_related(
             'author', 'tag1', 'tag2', 'tag3'
@@ -95,10 +95,10 @@ class QuestionDetailView(ListView, TrendingListViewMixin):
 
 
 class QuestionAnswerView(LoginRequiredMixin, FormView):
-    form_class = forms.AnswerForm
+    form_class = AnswerForm
 
     def form_valid(self, form):
-        a = models.Answer(
+        a = Answer(
             text=form.cleaned_data['text'],
             author=self.request.user,
             question_id=self.kwargs['question_id'])
@@ -151,8 +151,8 @@ class QuestionView(View):
 
 class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
     template_name = 'hasker/ask.html'
-    form_class = forms.AskForm
-    all_tags = models.Tag.objects.order_by('text')
+    form_class = AskForm
+    all_tags = Tag.objects.order_by('text')
 
     def form_valid(self, form):
         self.question = form.save(commit=False)
@@ -160,13 +160,13 @@ class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
 
         tag_texts = form.cleaned_data.get('tags')
         if len(tag_texts) > 0:
-            self.question.tag1 = models.Tag.objects.get_or_create(
+            self.question.tag1 = Tag.objects.get_or_create(
                 text=tag_texts[0])[0]
         if len(tag_texts) > 1:
-            self.question.tag2 = models.Tag.objects.get_or_create(
+            self.question.tag2 = Tag.objects.get_or_create(
                 text=tag_texts[1])[0]
         if len(tag_texts) > 2:
-            self.question.tag3 = models.Tag.objects.get_or_create(
+            self.question.tag3 = Tag.objects.get_or_create(
                 text=tag_texts[2])[0]
 
         self.question.save()
@@ -181,17 +181,17 @@ class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
 class MarkSolutionView(View):
 
     def post(self, request, answer_id, is_set):
-        solution = models.Answer.objects.get(pk=answer_id)
-        question = models.Question.objects.get(pk=solution.question.id)
+        solution = Answer.objects.get(pk=answer_id)
+        question = Question.objects.get(pk=solution.question.id)
 
         if not request.user.is_authenticated or \
            question.author != request.user:
             raise PermissionDenied
 
-        answers = models.Answer.objects.filter(question=question).all()
+        answers = Answer.objects.filter(question=question).all()
         for answer in answers:
             answer.correct = is_set if answer == solution else False
-        models.Answer.objects.bulk_update(answers, ['correct'])
+        Answer.objects.bulk_update(answers, ['correct'])
 
         return JsonResponse({})
 
@@ -202,9 +202,9 @@ class QuestionVoteView(View):
         if not request.user.is_authenticated:
             raise PermissionDenied
 
-        question = get_object_or_404(models.Question, pk=question_id)
+        question = get_object_or_404(Question, pk=question_id)
 
-        old_vote, _ = models.QuestionVote.objects.get_or_create(
+        old_vote, _ = QuestionVote.objects.get_or_create(
             user_id=self.request.user.id,
             question_id=question_id)
 
@@ -216,7 +216,7 @@ class QuestionVoteView(View):
         old_vote.vote = old_vote.vote + vote
         old_vote.save()
 
-        question = models.Question.objects.filter(
+        question = Question.objects.filter(
             id=question_id
         ).annotate(
             votes_sum=Coalesce(Sum('questionvote__vote'), Value(0))
@@ -231,9 +231,9 @@ class AnswerVoteView(View):
         if not request.user.is_authenticated:
             raise PermissionDenied
 
-        question = get_object_or_404(models.Answer, pk=answer_id)
+        question = get_object_or_404(Answer, pk=answer_id)
 
-        old_vote, _ = models.AnswerVote.objects.get_or_create(
+        old_vote, _ = AnswerVote.objects.get_or_create(
             user_id=self.request.user.id,
             answer_id=answer_id)
 
@@ -245,7 +245,7 @@ class AnswerVoteView(View):
         old_vote.vote = old_vote.vote + vote
         old_vote.save()
 
-        answers = models.Answer.objects.filter(
+        answers = Answer.objects.filter(
             id=answer_id
         ).annotate(
             votes_sum=Coalesce(Sum('answervote__vote'), Value(0))
@@ -256,12 +256,12 @@ class AnswerVoteView(View):
 
 class LoginFormView(LoginView, TrendingListViewMixin):
     template_name = 'login.html'
-    form_class = forms.LoginForm
+    form_class = LoginForm
 
 
 class SignupFormView(FormView, TrendingListViewMixin):
     template_name = 'signup.html'
-    form_class = forms.SignUpForm
+    form_class = SignUpForm
     success_url = urls.reverse_lazy('index')
 
     def form_valid(self, form):
@@ -279,7 +279,7 @@ class SignupFormView(FormView, TrendingListViewMixin):
 
 class SettingsFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
     template_name = 'hasker/settings.html'
-    form_class = forms.SettingsForm
+    form_class = SettingsForm
     success_url = urls.reverse_lazy('index')
 
     def form_valid(self, form):
@@ -311,9 +311,7 @@ class SearchListView(ListView, TrendingListViewMixin):
 
     def get_queryset(self):
         if self.tag:
-            query = Q(tag1__text=self.tag)
-            query.add(Q(tag2__text=self.tag), Q.OR)
-            query.add(Q(tag3__text=self.tag), Q.OR)
+            query = Q(tags__text=self.tag)
         else:
             query = Q(title__contains=f'{self.search_text}')
             query.add(Q(text__contains=f'{self.search_text}'), Q.OR)

@@ -23,7 +23,7 @@ def update_useravatar_signal(sender, instance, created, **kwargs):
 
 
 class Tag(models.Model):
-    text = models.CharField(max_length=32)
+    text = models.CharField(max_length=32, unique=True)
 
     def __str__(self):
         return self.text
@@ -35,26 +35,11 @@ class Question(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    tag1 = models.ForeignKey(Tag, blank=True, null=True,
-                             on_delete=models.SET_NULL,
-                             related_name='question_tags1')
-    tag2 = models.ForeignKey(Tag, blank=True, null=True,
-                             on_delete=models.SET_NULL,
-                             related_name='question_tags2')
-    tag3 = models.ForeignKey(Tag, blank=True, null=True,
-                             on_delete=models.SET_NULL,
-                             related_name='question_tags3')
+    tags = models.ManyToManyField(Tag)
 
     @property
-    def tags(self):
-        tag_list = []
-        if self.tag1:
-            tag_list.append(self.tag1)
-        if self.tag2:
-            tag_list.append(self.tag2)
-        if self.tag3:
-            tag_list.append(self.tag3)
-        return tag_list
+    def tag_list(self):
+        return self.tags.all()
 
     def __str__(self):
         return self.title

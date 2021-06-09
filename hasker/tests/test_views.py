@@ -206,8 +206,8 @@ class AskFormViewTest(TestCase):
 
         question = models.Question.objects.filter(title='TitleY').first()
         self.assertEqual(2, models.Tag.objects.count())
-        self.assertEqual('tag1', question.tag1.text)
-        self.assertEqual('tag2', question.tag2.text)
+        self.assertTrue(models.Tag.objects.get(text='tag1') in question.tag_list)
+        self.assertTrue(models.Tag.objects.get(text='tag2') in question.tag_list)
         self.assertRedirects(
             response,
             reverse('question', kwargs={'question_id': question.id})
@@ -601,8 +601,8 @@ class SearchListViewTest(TestCase):
 
     def test_tag_search(self):
         question = models.Question.objects.filter(title='Title 1').first()
-        question.tag1 = models.Tag.objects.create(text='tag1')
         question.save()
+        question.tags.create(text='tag1')
 
         response = self.client.get(
             reverse('search_tag', kwargs={'tag': 'tag1'})

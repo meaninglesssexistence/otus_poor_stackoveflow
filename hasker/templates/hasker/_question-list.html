@@ -14,7 +14,7 @@
         <div class="col">
           <a class="lead text-decoration-none" href="{% url 'question' question.id%}">{{question.title}}</a>
           <br/>
-          {% for tag in question.tags %}
+          {% for tag in question.tag_list %}
             <span class="bg-primary text-white text-center mx-1 px-1">
               {{ tag.text }}
             </span>

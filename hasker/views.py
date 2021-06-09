@@ -23,7 +23,9 @@ from .forms import AnswerForm, AskForm, LoginForm, SignUpForm, SettingsForm
 
 def get_question_list_queryset():
     return Question.objects.select_related(
-        'author', 'tag1', 'tag2', 'tag3'
+        'author'
+    ).prefetch_related(
+        'tags'
     ).annotate(
         answers_count=Count('answer', distinct=True)
     ).annotate(
@@ -81,7 +83,9 @@ class QuestionDetailView(ListView, TrendingListViewMixin):
         questions = Question.objects.filter(
             id=self.kwargs['question_id']
         ).select_related(
-            'author', 'tag1', 'tag2', 'tag3'
+            'author'
+        ).prefetch_related(
+            'tags'
         ).annotate(
             votes_sum=Coalesce(Sum('questionvote__vote'), Value(0))
         )
@@ -157,19 +161,12 @@ class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
     def form_valid(self, form):
         self.question = form.save(commit=False)
         self.question.author = self.request.user
-
-        tag_texts = form.cleaned_data.get('tags')
-        if len(tag_texts) > 0:
-            self.question.tag1 = Tag.objects.get_or_create(
-                text=tag_texts[0])[0]
-        if len(tag_texts) > 1:
-            self.question.tag2 = Tag.objects.get_or_create(
-                text=tag_texts[1])[0]
-        if len(tag_texts) > 2:
-            self.question.tag3 = Tag.objects.get_or_create(
-                text=tag_texts[2])[0]
-
         self.question.save()
+
+        for tag_text in form.cleaned_data.get('tags'):
+            tag, _ = Tag.objects.get_or_create(text=tag_text)
+            self.question.tags.add(tag)
+
         return super().form_valid(form)
 
     def get_success_url(self):

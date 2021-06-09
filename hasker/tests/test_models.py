@@ -85,30 +85,6 @@ class QuestionTest(TestCase):
         questions = models.Question.objects.count()
         self.assertEqual(0, questions)
 
-    def test_null_on_tag_removing(self):
-        question = models.Question.objects.create(
-            title='To be or not to be',
-            text='that is the questionm',
-            author=self.user,
-            tag1=self.tag1
-        )
-
-        self.tag1.delete()
-
-        questions = models.Question.objects.all()
-        self.assertEqual(1, len(questions))
-        self.assertIsNone(questions[0].tag1)
-
-    def test_tags_property(self):
-        question = models.Question.objects.create(
-            title='To be or not to be',
-            text='that is the questionm',
-            author=self.user,
-            tag1=self.tag1, tag2=self.tag2
-        )
-
-        self.assertEqual([self.tag1, self.tag2], question.tags)
-
     def test_default_value(self):
         question = models.Question.objects.create(
             title='To be or not to be',

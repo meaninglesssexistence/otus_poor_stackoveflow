@@ -2,6 +2,7 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from . import views
+from . import rest
 
 
 urlpatterns = [
@@ -11,31 +12,31 @@ urlpatterns = [
          views.QuestionView.as_view(),
          name='question'),
     path('question/<int:question_id>/vote-up/',
-         views.QuestionVoteView.as_view(),
+         rest.QuestionVoteView.as_view(),
          name='question-vote-up',
          kwargs={'is_up': True}),
     path('question/<int:question_id>/vote-down/',
-         views.QuestionVoteView.as_view(),
+         rest.QuestionVoteView.as_view(),
          name='question-vote-down',
          kwargs={'is_up': False}),
 
     path('question/solution-set/<int:answer_id>/',
-         views.MarkSolutionView.as_view(),
+         rest.MarkSolutionView.as_view(),
          name='solution-set',
          kwargs={'is_set': True}),
     path('question/solution-clear/<int:answer_id>/',
-         views.MarkSolutionView.as_view(),
+         rest.MarkSolutionView.as_view(),
          name='solution-clear',
          kwargs={'is_set': False}),
 
     path('question/ask/', views.AskFormView.as_view(), name='ask'),
 
     path('answer/<int:answer_id>/vote-up/',
-         views.AnswerVoteView.as_view(),
+         rest.AnswerVoteView.as_view(),
          name='answer-vote-up',
          kwargs={'is_up': True}),
     path('answer/<int:answer_id>/vote-down/',
-         views.AnswerVoteView.as_view(),
+         rest.AnswerVoteView.as_view(),
          name='answer-vote-down',
          kwargs={'is_up': False}),
 

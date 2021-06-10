@@ -36,11 +36,7 @@
       {% endfor %}
     </div>
     <div class="col">
-      {% if question.author.useravatar.avatar %}
-        <img class="avatar-small" src="{{ question.author.useravatar.avatar.url }}"/>
-      {% else %}
-        <img class="avatar-small" src="{% static 'img/no-avatar.png' %}"/>
-      {% endif %}
+      <img class="avatar-small" src="{{ question.author.useravatar.avatar_url }}"/>
       {{ question.author.username }}
     </div>
   </div>
@@ -99,11 +95,7 @@
           <div class="col-8">
           </div>
           <div class="col">
-            {% if answer.author.useravatar.avatar %}
-              <img class="avatar-small" src="{{ answer.author.useravatar.avatar.url }}"/>
-            {% else %}
-              <img class="avatar-small" src="{% static 'img/no-avatar.png' %}"/>
-            {% endif %}
+            <img class="avatar-small" src="{{ answer.author.useravatar.avatar_url }}"/>
             {{ answer.author.username }}
           </div>
         </div>

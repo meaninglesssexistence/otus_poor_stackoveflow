@@ -24,7 +24,9 @@
           {% include "_search-bar.html" %}
         </div>
         <div class="col-1">
-          {% include "_user-avatar.html" %}
+          {% if user.is_authenticated %}
+            <img class="avatar-large" src="{{ user.useravatar.avatar_url }}"/>
+          {% endif %}
         </div>
         <div class="col-1 my-auto">
           {% include "_auth.html" %}

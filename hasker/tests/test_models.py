@@ -122,23 +122,3 @@ class QuestionVoteTest(TestCase):
 
     def test_default_value(self):
         self.assertEqual(0, self.vote.vote)
-
-
-class UserAvatarTest(TestCase):
-    def test_avatar_creation_on_user_creation(self):
-        user = User.objects.create_user('john', 'john@example.com', '123')
-        avatars = models.UserAvatar.objects.all()
-
-        self.assertEqual(1, len(avatars))
-        self.assertFalse(avatars[0].avatar)
-
-    def test_avatar_removing_on_user_removing(self):
-        user = User.objects.create_user('john', 'john@example.com', '123')
-
-        avatars = models.UserAvatar.objects.all()
-        self.assertEqual(1, len(avatars))
-
-        user.delete()
-
-        avatars = models.UserAvatar.objects.all()
-        self.assertEqual(0, len(avatars))

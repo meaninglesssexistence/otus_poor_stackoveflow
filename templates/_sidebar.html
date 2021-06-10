@@ -1,0 +1,13 @@
+{% if user.is_authenticated %}
+  {% url 'ask' as ask_url %}
+  {% if request.path != ask_url %}
+    <div class="text-center">
+      <a href="{% url 'ask' %}" class="btn btn-primary">Ask!</a>
+    </div>
+  {% endif %}
+{% endif %}
+
+<h2 class="text-center">Trending</h2>
+
+{% load template-ext %}
+{% trending_list %}

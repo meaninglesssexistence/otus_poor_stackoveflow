@@ -1,11 +1,7 @@
 from django import urls
 from django.conf import settings
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
-from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import F, Q, Count, Sum, Value
 from django.db.models.functions import Coalesce
@@ -18,7 +14,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView, FormView
 
 from .models import Answer, Question, Tag
-from .forms import AnswerForm, AskForm, LoginForm, SignUpForm, SettingsForm
+from .forms import AnswerForm, AskForm
 
 
 def get_question_list_queryset():
@@ -38,15 +34,7 @@ def get_question_list_queryset():
     )
 
 
-class TrendingListViewMixin:
-    trending_list = Question.objects.annotate(
-        votes_sum=Coalesce(Sum('questionvote__vote'), Value(0))
-    ).order_by(
-        '-votes_sum', '-creation_date'
-    ).all()[:settings.HASKER_TRENDING_SIZE]
-
-
-class QuestionListView(ListView, TrendingListViewMixin):
+class QuestionListView(ListView):
     paginate_by = settings.HASKER_QUESTION_LIST_PAGE
     template_name = 'hasker/index.html'
     queryset = get_question_list_queryset()
@@ -61,7 +49,7 @@ class QuestionListView(ListView, TrendingListViewMixin):
         return self.request.GET.get('sort', '') == 'hot'
 
 
-class QuestionDetailView(ListView, TrendingListViewMixin):
+class QuestionDetailView(ListView):
     paginate_by = settings.HASKER_ANSWER_LIST_PAGE
     template_name = 'hasker/question.html'
 
@@ -157,7 +145,7 @@ class QuestionView(View):
         return view(request, question_id=question_id)
 
 
-class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
+class AskFormView(LoginRequiredMixin, FormView):
     template_name = 'hasker/ask.html'
     form_class = AskForm
     all_tags = Tag.objects.order_by('text')
@@ -179,48 +167,7 @@ class AskFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
         )
 
 
-class LoginFormView(LoginView, TrendingListViewMixin):
-    template_name = 'login.html'
-    form_class = LoginForm
-
-
-class SignupFormView(FormView, TrendingListViewMixin):
-    template_name = 'signup.html'
-    form_class = SignUpForm
-    success_url = urls.reverse_lazy('index')
-
-    def form_valid(self, form):
-        # Create new user
-        user = form.save()
-        user.refresh_from_db()
-        user.useravatar.avatar = form.cleaned_data.get('avatar')
-        user.save()
-        password = form.cleaned_data.get('password1')
-        # Login new user
-        user = authenticate(username=user.username, password=password)
-        login(self.request, user)
-        return super().form_valid(form)
-
-
-class SettingsFormView(LoginRequiredMixin, FormView, TrendingListViewMixin):
-    template_name = 'hasker/settings.html'
-    form_class = SettingsForm
-    success_url = urls.reverse_lazy('index')
-
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.useravatar.avatar = form.cleaned_data.get('avatar')
-        user.save()
-        return super().form_valid(form)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['instance'] = self.request.user
-        kwargs['initial'] = {'avatar': self.request.user.useravatar.avatar}
-        return kwargs
-
-
-class SearchListView(ListView, TrendingListViewMixin):
+class SearchListView(ListView):
     paginate_by = settings.HASKER_QUESTION_LIST_PAGE
 
     def get(self, request, tag=None):

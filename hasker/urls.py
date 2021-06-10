@@ -1,4 +1,3 @@
-from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from . import views
@@ -39,11 +38,6 @@ urlpatterns = [
          rest.AnswerVoteView.as_view(),
          name='answer-vote-down',
          kwargs={'is_up': False}),
-
-    path('login/', views.LoginFormView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('signup/', views.SignupFormView.as_view(), name='signup'),
-    path('settings/', views.SettingsFormView.as_view(), name='settings'),
 
     path('search/',
          views.SearchListView.as_view(template_name='hasker/search-txt.html'),

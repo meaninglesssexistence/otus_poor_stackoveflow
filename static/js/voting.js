@@ -45,7 +45,12 @@ function setClickHandlers(isAuth, itemCssClass, getUrl, onResponse) {
           if (!response.ok)
             throw Error(response);
 
-          return response.json();
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+            return response.json();
+          } else {
+            return {};
+          }
         })
         .then(data => onResponse(this, data))
         .catch(error => { console.log(error);/* do nothing on error */ });

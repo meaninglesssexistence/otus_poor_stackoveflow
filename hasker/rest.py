@@ -1,6 +1,6 @@
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 
@@ -22,7 +22,7 @@ class MarkSolutionView(View):
             answer.correct = is_set if answer == solution else False
         Answer.objects.bulk_update(answers, ['correct'])
 
-        return JsonResponse({})
+        return HttpResponse()
 
 
 class QuestionVoteView(View):

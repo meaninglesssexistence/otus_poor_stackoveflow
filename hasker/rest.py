@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""Обработчики REST-запросов на пометку правильного ответа и голосования.
+
+Полноценный REST API для приложения не реализован, поэтому `rest_framework`
+не применялся.
+"""
+
 from django.core.exceptions import PermissionDenied
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
@@ -9,6 +16,17 @@ from .models import Answer, AnswerVote, Question, QuestionVote
 
 
 class MarkSolutionView(View):
+    """Обработка запроса на пометку верного ответа.
+
+    Принимается POST-запрос. Если пользователь не аутентифицирован,
+    выдается ошибка. Для всех ответов, кроме указанного, пометка
+    снимается. Для указанного она снимается или устанавливается в
+    зависимости от параметров запроса.
+
+    Параметры:
+        answer_id: идентификатор ответа
+        is_set: True - пометка устанавливается, False - снимается.
+    """
 
     def post(self, request, answer_id, is_set):
         solution = Answer.objects.get(pk=answer_id)
@@ -27,7 +45,18 @@ class MarkSolutionView(View):
 
 
 class QuestionVoteView(View):
+    """Обработка запроса на голосование за вопрос.
 
+    Принимается POST-запрос. Если пользователь не аутентифицирован,
+    выдается ошибка. Если сумма голосов, отданных пользователем,
+    выйдет за границы [-1, 1], выдается ошибка. Создается, при
+    необходимости, новый экземпляр QuestionVote. В него записывается
+    или обновляется голос.
+
+    Параметры:
+        question_id: идентификатор вопроса
+        is_up: True - голос за, False - голос против.
+    """
     def post(self, request, question_id, is_up):
         if not request.user.is_authenticated:
             raise PermissionDenied
@@ -56,6 +85,18 @@ class QuestionVoteView(View):
 
 
 class AnswerVoteView(View):
+    """Обработка запроса на голосование за ответ.
+
+    Принимается POST-запрос. Если пользователь не аутентифицирован,
+    выдается ошибка. Если сумма голосов, отданных пользователем,
+    выйдет за границы [-1, 1], выдается ошибка. Создается, при
+    необходимости, новый экземпляр AnswerVote. В него записывается
+    или обновляется голос.
+
+    Параметры:
+        answer_id: идентификатор ответа
+        is_up: True - голос за, False - голос против.
+    """
 
     def post(self, request, answer_id, is_up):
         if not request.user.is_authenticated:

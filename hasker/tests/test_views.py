@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Тесты для view-классов."""
+
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.core import mail
@@ -11,6 +14,7 @@ from . import factories
 
 
 def createTestData(question_num):
+    """ Создание набора тестовых данных. """
     user_num = 30
     answer_num = max(30, question_num)
     question_vote_num = max(30, question_num)

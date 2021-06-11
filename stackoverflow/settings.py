@@ -1,10 +1,10 @@
-"""
-Django settings for Stackoverflow project.
+# -*- coding: utf-8 -*-
+"""Django-настройки для проекта.
 
-For more information on this file, see
+Детали:
 https://docs.djangoproject.com/en/3.1/topics/settings/
 
-For the full list of settings and their values, see
+Полный список настроек:
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 

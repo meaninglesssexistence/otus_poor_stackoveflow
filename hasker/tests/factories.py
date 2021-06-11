@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Фабрики factory boy для подмены моделей в тестах."""
+
 import django.utils
 import factory
 

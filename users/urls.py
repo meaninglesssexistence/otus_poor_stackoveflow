@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Маршрутизация URL-ов для приложения."""
+
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 

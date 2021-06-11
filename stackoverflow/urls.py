@@ -1,7 +1,7 @@
-"""
-Stackoverflow URL Configuration.
+# -*- coding: utf-8 -*-
+"""Настройки маршрутизации URL-ов для проекта.
 
-For more information on this file, see
+Детали:
 https://docs.djangoproject.com/en/3.1/topics/http/urls/
 """
 

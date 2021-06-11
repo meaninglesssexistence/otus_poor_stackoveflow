@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Классы-формы для работы с пользователем."""
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
@@ -7,10 +10,22 @@ from . import models
 from stackoverflow.bootstrapforms import BootstrapFormMixin
 
 class LoginForm(BootstrapFormMixin, AuthenticationForm):
+    """Форма логина.
+
+    Используется стандартная форма AuthenticationForm.
+    Класс BootstrapFormMixin подключает Bootstrap для ее отображения.
+    """
     ...
 
 
 class SignUpForm(BootstrapFormMixin, UserCreationForm):
+    """Форма добавления нового пользователя.
+
+    Используется стандартная форма UserCreationForm.
+    Класс BootstrapFormMixin подключает Bootstrap для ее отображения.
+    Добавляетсся поле avatar для работы с аватаркой пользователя.
+    """
+
     avatar = forms.ImageField(required=False)
 
     class Meta:
@@ -19,6 +34,12 @@ class SignUpForm(BootstrapFormMixin, UserCreationForm):
 
 
 class ImagePreviewWidget(forms.widgets.ClearableFileInput):
+    """Виджет для отображения аватарки пользователя.
+
+    Если у пользователя указан аватар, выводится он. Если нет, выводится
+    стандартное изображение.
+    """
+
     def render(self, name, value, attrs=None, **kwargs):
         input_html = super().render(name, value, attrs, **kwargs)
         if value:
@@ -32,6 +53,8 @@ class ImagePreviewWidget(forms.widgets.ClearableFileInput):
 
 
 class SettingsForm(BootstrapFormMixin, forms.ModelForm):
+    """Форма изменения настроек пользователя."""
+
     avatar = forms.ImageField(required=False, widget=ImagePreviewWidget)
 
     class Meta:

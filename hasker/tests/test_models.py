@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Тесты для классов-моделей."""
+
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase

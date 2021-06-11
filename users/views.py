@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Обработчики запросов."""
+
 from django import urls
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,11 +10,18 @@ from django.views.generic.edit import FormView
 from .forms import LoginForm, SignUpForm, SettingsForm
 
 class LoginFormView(LoginView):
+    """Обработка запроса на логин пользователя."""
+
     template_name = 'users/login.html'
     form_class = LoginForm
 
 
 class SignupFormView(FormView):
+    """Обработка запроса на создание нового пользователя.
+
+    После успешного создания пользователя осуществляется его логин.
+    """
+
     template_name = 'users/signup.html'
     form_class = SignUpForm
     success_url = urls.reverse_lazy('index')
@@ -30,6 +40,8 @@ class SignupFormView(FormView):
 
 
 class SettingsFormView(LoginRequiredMixin, FormView):
+    """Обработка запроса на изменение настроек пользователя."""
+
     template_name = 'users/settings.html'
     form_class = SettingsForm
     success_url = urls.reverse_lazy('index')

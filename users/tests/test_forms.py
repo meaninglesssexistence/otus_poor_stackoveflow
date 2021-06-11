@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Тесты для классов - форм."""
+
 import django
 import inspect
 from django.test import TestCase

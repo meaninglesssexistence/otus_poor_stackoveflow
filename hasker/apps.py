@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Настройки приложения."""
+
 from django.apps import AppConfig
 
 

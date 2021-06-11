@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Настройки модуля администрирования."""
+
 from django.contrib import admin
 
 from . import models

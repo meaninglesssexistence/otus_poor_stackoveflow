@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Обработчики запросов."""
+
 from django import urls
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,6 +21,10 @@ from .forms import AnswerForm, AskForm
 
 
 def get_question_list_queryset():
+    """Возвращает запрос списка вопросов с их авторами,
+       подсчетом ответов и голосов.
+    """
+
     return Question.objects.select_related(
         'author'
     ).prefetch_related(
@@ -35,6 +42,13 @@ def get_question_list_queryset():
 
 
 class QuestionListView(ListView):
+    """Обработка запроса на вывод списка вопросов.
+
+    Список выводится постранично. В зависимости от параметра
+    запроса, меняется сортировка: по количеству голосов или
+    по дате создания вопроса.
+    """
+
     paginate_by = settings.HASKER_QUESTION_LIST_PAGE
     template_name = 'hasker/index.html'
     queryset = get_question_list_queryset()
@@ -50,6 +64,12 @@ class QuestionListView(ListView):
 
 
 class QuestionDetailView(ListView):
+    """Обработка запроса на вывод вопроса и списка ответов.
+
+    Список ответов выводится постранично с сортировкой по количеству
+    голосов.
+    """
+
     paginate_by = settings.HASKER_ANSWER_LIST_PAGE
     template_name = 'hasker/question.html'
 
@@ -87,6 +107,8 @@ class QuestionDetailView(ListView):
 
 
 class QuestionAnswerView(LoginRequiredMixin, CreateView):
+    """Обработка запроса на создание нового ответа."""
+
     form_class = AnswerForm
     model = Answer
 
@@ -135,6 +157,12 @@ class QuestionAnswerView(LoginRequiredMixin, CreateView):
 
 
 class QuestionView(View):
+    """Обработчик запросов, связанных в вопросом.
+
+    При поступлении GET-запроса, обработка передается в QuestionDetailView для
+    вывода параметров вопроса и списка ответов. При поступлении POST-запроса,
+    обработка передается в QuestionAnswerView для создания нового ответа.
+    """
 
     def get(self, request, question_id):
         view = QuestionDetailView.as_view()
@@ -146,6 +174,8 @@ class QuestionView(View):
 
 
 class AskFormView(LoginRequiredMixin, FormView):
+    """Обработчик запроса на создание нового вопроса."""
+
     template_name = 'hasker/ask.html'
     form_class = AskForm
     all_tags = Tag.objects.order_by('text')
@@ -168,6 +198,13 @@ class AskFormView(LoginRequiredMixin, FormView):
 
 
 class SearchListView(ListView):
+    """Обработчик запроса на поиск по тексту.
+
+    Поиск производится по тексту заголовка вопроса, тексту вопроса
+    и ответов на вопрос. Если запрос имеет форму "tag: <тег>", из
+    запроса извлекается имя тега и поиск ведется по тегам.
+    """
+
     paginate_by = settings.HASKER_QUESTION_LIST_PAGE
 
     def get(self, request, tag=None):

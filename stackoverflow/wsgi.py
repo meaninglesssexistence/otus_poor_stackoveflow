@@ -1,9 +1,7 @@
-"""
-WSGI config for stackoverflow project.
+# -*- coding: utf-8 -*-
+"""Настройки WSGI для проекта.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
+Детали:
 https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 """
 

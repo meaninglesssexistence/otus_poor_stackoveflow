@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Классы-формы для создания вопросов и ответов."""
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -7,6 +10,12 @@ from . import models
 
 
 class TagsField(forms.CharField):
+    """Поле для отображения и ввода тегов.
+
+    Поле отображает список тегов, как строки, разделенные запятой.
+    При сохранении, строка разбивается по запятым и конвертируется в список.
+    """
+
     def to_python(self, value):
         if not value:
             return []
@@ -19,6 +28,8 @@ class TagsField(forms.CharField):
 
 
 class AskForm(BootstrapFormMixin, forms.ModelForm):
+    """Форма добавления нового вопроса."""
+
     tags = TagsField(required=False)
 
     class Meta:
@@ -30,6 +41,8 @@ class AskForm(BootstrapFormMixin, forms.ModelForm):
 
 
 class AnswerForm(forms.ModelForm):
+    """Форма добавления нового ответа на вопрос."""
+
     class Meta:
         model = models.Answer
         fields = ('text',)

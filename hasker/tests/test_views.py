@@ -1,5 +1,4 @@
-import django.utils
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.core import mail
 from django.db.models import Sum, Value
@@ -8,6 +7,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from hasker import models, views
+from . import factories
+
 
 def createTestData(question_num):
     user_num = 30
@@ -15,37 +16,32 @@ def createTestData(question_num):
     question_vote_num = max(30, question_num)
     answer_vote_num = max(30, answer_num)
 
-    for user_id in range(user_num):
-        User.objects.create_user(
-            f'User{user_id}', f'{user_id}@example.com', '123'
-        )
+    factories.UserFactory.reset_sequence()
+    factories.QuestionFactory.reset_sequence()
+    factories.AnswerFactory.reset_sequence()
 
-    now = django.utils.timezone.now()
-    for question_id in range(question_num):
-        now = now + timedelta(minutes=1)
-        question = models.Question.objects.create(
-            title=f'Title {question_id}',
-            text=f'Text {question_id}',
-            creation_date=now,
-            author=User.objects.get(username=f'User{question_id}')
-        )
+    factories.UserFactory.create_batch(size=user_num)
+
+    questions = factories.QuestionFactory.create_batch(size=question_num)
+
+    for question_id, question in enumerate(questions):
         if question_id != 0:
             for vote_id in range(question_vote_num - question_id):
-                models.QuestionVote.objects.create(
+                factories.QuestionVoteFactory(
                     user=User.objects.get(username=f'User{vote_id}'),
                     question=question,
                     vote=1
                 )
         if question_id != (question_num - 1):
             for answer_id in range(answer_num - question_id):
-                answer = models.Answer.objects.create(
+                answer = factories.AnswerFactory(
                     text=f'Text {answer_id}',
                     author=User.objects.get(username=f'User{answer_id}'),
                     question=question
                 )
                 if answer_id != 0:
                     for vote_id in range(answer_vote_num - answer_id):
-                        models.AnswerVote.objects.create(
+                        factories.AnswerVoteFactory(
                             user=User.objects.get(username=f'User{vote_id}'),
                             answer=answer,
                             vote=1
@@ -251,6 +247,8 @@ class MarkSolutionViewTest(TestCase):
     def test_change_solution(self):
         question = models.Question.objects.filter(title='Title 1').first()
         answers = models.Answer.objects.filter(question__id=question.id)
+        self.assertFalse(models.Answer.objects.get(pk=answers[0].id).correct)
+        self.assertFalse(models.Answer.objects.get(pk=answers[1].id).correct)
 
         self.client.login(username=question.author.username, password='123')
 

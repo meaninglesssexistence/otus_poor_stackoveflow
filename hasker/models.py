@@ -18,6 +18,9 @@ class Question(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
+    voters = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='QuestionVote', related_name='questions')
 
     @property
     def tag_list(self):
@@ -34,6 +37,9 @@ class Answer(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    voters = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='AnswerVote', related_name='answers')
 
     def __str__(self):
         return self.text
